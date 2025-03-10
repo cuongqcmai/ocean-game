@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="dns-prefetch" href="http://res.wx.qq.com" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>Flappy Bird</title>
+    <script type="application/javascript" src="fastclick.js"></script>
+  </head>
+  <style>
+    @font-face {
+      font-family: "Press Start 2P";
+      src: url("PressStart2P.ttf") format("truetype");
+    }
+    * {
+      cursor: pointer;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::selection {
+      background: transparent;
+    }
+    ::-moz-selection {
+      background: transparent;
+    }
+    .option,
+    .mode {
+      display: inline-block;
+      width: 70px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      position: absolute;
+      top: 2px;
+      text-align: center;
+      font-size: 11px;
+      font-family: "Press Start 2P";
+      padding-top: 5px;
+      z-index: 2;
+    }
+    .option:hover,
+    .mode:hover {
+      background: #fff;
+    }
+    #modes {
+      position: absolute;
+      top: 28px;
+    }
+    #easy {
+      left: 2px;
+    }
+
+    canvas {
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+  <body style="padding: 0; margin: 0; outline: 0; overflow: hidden">
+    <canvas id="canvas"></canvas>
+
+    <br />
+
+    <script type="application/javascript" src="fb.js"></script>
+  </body>
+</html>
