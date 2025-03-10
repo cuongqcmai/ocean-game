@@ -16,6 +16,11 @@ var wechat = false;
 var playend = false,
   playdata = [];
 var wxData;
+
+
+
+
+
 sky = new Image();
 sky.src = "images/sky.png";
 var clearCanvas = function () {
@@ -349,12 +354,72 @@ window.onload = function () {
   mode = 0;
   delta = 100;
   initCanvas();
-  easy = document.getElementById("easy");
-  easy.onclick = easyMode;
   //document.getElementById("hidden").onclick = hidden;
   window.onresize = function () {
     canvas.width = width = window.innerWidth;
     canvas.height = height = window.innerHeight;
     drawCanvas();
   };
+ 
 };
+
+// // Firebase Config
+// const firebaseConfig = {
+//   apiKey: "AIzaSyB8sL8eikrdab-VyCoLA0jeWacXZqkaVdc",
+//   authDomain: "ocean-game-1b6d2.firebaseapp.com",
+//   databaseURL: "https://ocean-game-1b6d2-default-rtdb.firebaseio.com",
+//   projectId: "ocean-game-1b6d2",
+//   storageBucket: "ocean-game-1b6d2.appspot.com",
+//   messagingSenderId: "219096053823",
+//   appId: "1:219096053823:web:cb6fee080a35107891208a",
+//   measurementId: "G-PG8Q5S29DZ"
+// };
+
+// // Khởi tạo Firebase (Không dùng import, dùng trực tiếp từ CDN)
+// if (typeof firebase !== "undefined") {
+//   firebase.initializeApp(firebaseConfig);
+//   const db = firebase.database();
+// } else {
+//   console.error("Firebase chưa được tải!");
+// }
+
+// // Lưu điểm lên Firebase
+// function saveScore(playerName, score) {
+//   if (!firebase.database) {
+//     console.error("Firebase Database chưa khởi tạo!");
+//     return;
+//   }
+//   db.ref("scores/").push({
+//     name: playerName,
+//     score: score,
+//     timestamp: Date.now()
+//   });
+// }
+
+// // Hiển thị bảng xếp hạng
+// function loadLeaderboard() {
+//   if (!document.getElementById("leaderboard")) {
+//     console.error("Không tìm thấy phần tử leaderboard!");
+//     return;
+//   }
+
+//   db.ref("scores/")
+//     .orderByChild("score")
+//     .limitToLast(10)
+//     .once("value", (snapshot) => {
+//       let scores = [];
+//       snapshot.forEach((child) => {
+//         scores.push(child.val());
+//       });
+//       scores.reverse();
+//       let leaderboardHTML = scores
+//         .map((s, i) => `<p>${i + 1}. ${s.name} - ${s.score}</p>`)
+//         .join("");
+//       document.getElementById("leaderboard").innerHTML = leaderboardHTML;
+//     });
+// }
+
+// // Khi trang load, gọi bảng xếp hạng
+// window.onload = function () {
+//   loadLeaderboard();
+// }

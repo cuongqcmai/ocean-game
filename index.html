@@ -11,8 +11,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
     <title>Flappy Bird</title>
-    <script type="application/javascript" src="fastclick.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"></script>
+  <!-- Firebase SDK -->
+<script type="application/javascript" src="fastclick.js"></script>
+<script  src="fb.js"></script>
+
+
+
   </head>
+
   <style>
     @font-face {
       font-family: "Press Start 2P";
@@ -63,9 +71,9 @@
   </style>
   <body style="padding: 0; margin: 0; outline: 0; overflow: hidden">
     <canvas id="canvas"></canvas>
-
+<div id="leaderboard"></div>
     <br />
-
-    <script type="application/javascript" src="fb.js"></script>
+    
+   
   </body>
 </html>
