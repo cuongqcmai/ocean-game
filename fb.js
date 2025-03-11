@@ -117,6 +117,7 @@ var initCanvas = function () {
     canvas.addEventListener(
       "touchstart",
       function (e) {
+        bgMusic.play();
         jump();
         e.preventDefault();
       },
@@ -358,8 +359,6 @@ var jump = function () {
     }
 
     anim();
-    bgMusic.play();
-
     clearInterval(difficultyIncrease);
     difficultyIncrease = setInterval(() => {
       if (score > lastScoreMilestone) {
