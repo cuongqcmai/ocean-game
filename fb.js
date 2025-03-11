@@ -16,7 +16,12 @@ var playend = false,
   playdata = [];
 var difficultyIncrease;
 var lastScoreMilestone = 0;
+var jumpSound = new Audio("sounds/jump.mp3");
+var hitSound = new Audio("sounds/hit.mp3");
+var bgMusic = new Audio("sounds/background.mp3");
 window.score = 0;
+bgMusic.loop = true;
+bgMusic.volume = 0.5;
 
 sky = new Image();
 sky.src = "images/sky.png";
@@ -130,7 +135,8 @@ function showScoreModal() {
   dropSpeed = 0.3;
   delta = 100;
   isShowSubmitForm = true;
-  document.getElementById("scoreModal").style.display = "block";
+  document.getElementById("scoreModal").style.display = "flex";
+  bgMusic.pause();
 
   // 🛑 Dừng tăng độ khó khi game kết thúc
   clearInterval(difficultyIncrease);
@@ -204,6 +210,9 @@ var drawBird = function () {
   if (birdY + 138 > height) {
     clearInterval(animation);
     death = 1;
+    hitSound.play();
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
     showScoreModal();
   }
   if (death) deathAnimation();
@@ -222,6 +231,7 @@ var drawPipe = function (x, y) {
   ) {
     clearInterval(animation);
     death = 1;
+    hitSound.play();
     showScoreModal();
   } else if (x + 40 < 0) {
     pipeSt++;
@@ -348,6 +358,7 @@ var jump = function () {
     }
 
     anim();
+    bgMusic.play();
 
     clearInterval(difficultyIncrease);
     difficultyIncrease = setInterval(() => {
@@ -362,6 +373,8 @@ var jump = function () {
       }
     }, 3000);
   }
+  jumpSound.currentTime = 0;
+  jumpSound.play();
   birdV = 6;
 };
 
