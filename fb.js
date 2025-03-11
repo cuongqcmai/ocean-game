@@ -1,9 +1,3 @@
-import {
-  getDatabase,
-  ref,
-  push,
-} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
-
 var canvas, ctx;
 var width, height, birdPos;
 var sky, land, bird, pipe, pipeUp, pipeDown, scoreBoard, ready, splash;
@@ -20,6 +14,8 @@ var flashlight_switch = false,
 var mode, delta;
 var playend = false,
   playdata = [];
+var difficultyIncrease;
+var lastScoreMilestone = 0;
 window.score = 0;
 
 sky = new Image();
@@ -131,8 +127,13 @@ var initCanvas = function () {
 };
 
 function showScoreModal() {
+  dropSpeed = 0.3;
+  delta = 100;
   isShowSubmitForm = true;
   document.getElementById("scoreModal").style.display = "block";
+
+  // 🛑 Dừng tăng độ khó khi game kết thúc
+  clearInterval(difficultyIncrease);
 }
 
 // Gửi điểm lên Firebase
@@ -185,31 +186,7 @@ var drawLand = function () {
   }
 };
 
-var drawPipe = function (x, y) {
-  ctx.drawImage(pipe, x, 0, pipe.width, y);
-  ctx.drawImage(pipeDown, x, y);
-  ctx.drawImage(pipe, x, y + 168 + delta, pipe.width, height - 112);
-  ctx.drawImage(pipeUp, x, y + 144 + delta);
-  if (
-    x < birdPos + 32 &&
-    x + 50 > birdPos &&
-    (birdY < y + 22 || birdY + 22 > y + 144 + delta)
-  ) {
-    clearInterval(animation);
-    death = 1;
-    showScoreModal();
-  } else if (x + 40 < 0) {
-    pipeSt++;
-    pipeNumber++;
-    pipes.push(Math.floor(Math.random() * (height - 300 - delta) + 10));
-    pipesDir.push(Math.random() > 0.5);
-  }
-};
-
 var drawBird = function () {
-  //	ctx.translate(width * 0.35 + 17, birdY + 12);
-  //	var deg = -Math.atan(birdV / 2) / 3.14159;
-  //	ctx.rotate(deg);
   ctx.drawImage(
     bird,
     0,
@@ -221,10 +198,7 @@ var drawBird = function () {
     bird.width,
     bird.height
   );
-  //	ctx.rotate(-deg);
-  //	ctx.translate(-width * 0.35 - 17, -birdY - 12);
-  // birdF = (birdF + 1) % 6;
-  // if (birdF % 6 == 0) birdN = (birdN + 1) % 4;
+
   birdY -= birdV;
   birdV -= dropSpeed;
   if (birdY + 138 > height) {
@@ -232,11 +206,30 @@ var drawBird = function () {
     death = 1;
     showScoreModal();
   }
-  if (death) {
-    deathAnimation();
-  }
+  if (death) deathAnimation();
 };
 
+var drawPipe = function (x, y) {
+  ctx.drawImage(pipe, x, 0, pipe.width, y);
+  ctx.drawImage(pipeDown, x, y);
+  ctx.drawImage(pipe, x, y + 168 + delta, pipe.width, height - 112);
+  ctx.drawImage(pipeUp, x, y + 144 + delta);
+
+  if (
+    x < birdPos + 32 &&
+    x + 50 > birdPos &&
+    (birdY < y + 22 || birdY + 22 > y + 144 + delta)
+  ) {
+    clearInterval(animation);
+    death = 1;
+    showScoreModal();
+  } else if (x + 40 < 0) {
+    pipeSt++;
+    pipeNumber++;
+    pipes.push(Math.floor(Math.random() * (height - 300 - delta) + 10)); // 🔥 Áp dụng delta mới
+    pipesDir.push(Math.random() > 0.5);
+  }
+};
 var drawScore = function () {
   ctx.font = '50px "Press Start 2P"';
   ctx.lineWidth = 5;
@@ -345,35 +338,32 @@ var jump = function () {
     pipeNumber = 10;
     pipes = [];
     pipesDir = [];
+    dropSpeed = 0.3;
+    delta = 100;
+    lastScoreMilestone = 0;
+
     for (var i = 0; i < 10; ++i) {
       pipes.push(Math.floor(Math.random() * (height - 300 - delta) + 10));
       pipesDir.push(Math.random() > 0.5);
     }
+
     anim();
+
+    clearInterval(difficultyIncrease);
+    difficultyIncrease = setInterval(() => {
+      if (score > lastScoreMilestone) {
+        lastScoreMilestone = score;
+        if (dropSpeed < 0.4) {
+          dropSpeed *= 1.05;
+        }
+        if (delta > 45) {
+          delta *= 0.95;
+        }
+      }
+    }, 3000);
   }
-  if (mode == 0) birdV = 6;
-  else if (mode == 1) birdV = 6;
-  else birdV = 6;
+  birdV = 6;
 };
-
-var easy;
-
-function easyMode() {
-  easy.style["box-shadow"] = "0 0 0 2px #165CF3";
-  clearInterval(animation);
-  dropSpeed = 0.3;
-  mode = 0;
-  delta = 100;
-  initCanvas();
-}
-
-function hidden() {
-  document.getElementById("hidden").style.background = [
-    "red",
-    "rgba(255, 255, 255, 0.6)",
-  ][+hidden_switch];
-  hidden_switch ^= 1;
-}
 
 window.onload = function () {
   mode = 0;
@@ -381,10 +371,10 @@ window.onload = function () {
   playdata = [0, 0];
   maxScore = 0;
   dropSpeed = 0.3;
-  mode = 0;
   delta = 100;
+
   initCanvas();
-  //document.getElementById("hidden").onclick = hidden;
+
   window.onresize = function () {
     canvas.width = width = window.innerWidth;
     canvas.height = height = window.innerHeight;

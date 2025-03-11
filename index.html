@@ -133,11 +133,16 @@
       function closeLeaderboard() {
         document.getElementById("leaderboardModal").style.display = "none";
       }
+      function closeSubmitForm() {
+        isShowSubmitForm = false;
+        document.getElementById("scoreModal").style.display = "none";
+      }
 
       window.submitScore = submitScore;
       window.showLeaderboard = showLeaderboard;
       window.closeLeaderboard = closeLeaderboard;
       window.isShowSubmitForm = false;
+      window.closeSubmitForm = closeSubmitForm;
       loadLeaderboard();
     </script>
     <script type="module" src="fb.js"></script>
@@ -154,6 +159,17 @@
       -webkit-user-select: none;
       -ms-user-select: none;
       -webkit-tap-highlight-color: transparent;
+    }
+    body * {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body input {
+      -webkit-touch-callout: text;
+      -webkit-user-select: text;
+      user-select: text;
     }
     ::selection {
       background: transparent;
@@ -277,7 +293,6 @@
       <ul id="leaderboardTop5"></ul>
     </div>
 
-    <!-- Leaderboard Modal -->
     <div id="leaderboardModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeLeaderboard()">&times;</span>
@@ -286,13 +301,18 @@
       </div>
     </div>
 
-    <!-- Icon mở bảng xếp hạng -->
     <button id="leaderboardBtn" onclick="showLeaderboard()">📊 Ranking</button>
     <br />
     <div id="scoreModal" class="modal">
       <div class="modal-content">
+        <span class="close" onclick="closeSubmitForm()">&times;</span>
         <h2>Enter your name</h2>
-        <input type="text" id="playerName" placeholder="Your name" />
+        <input
+          type="text"
+          id="playerName"
+          class="needsfocus"
+          placeholder="Your name"
+        />
         <button onclick="submitScore()">Save score</button>
       </div>
     </div>
