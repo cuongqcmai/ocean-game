@@ -11,14 +11,138 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
     <title>Flappy Bird</title>
-    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"></script>
-  <!-- Firebase SDK -->
-<script type="application/javascript" src="fastclick.js"></script>
-<script  src="fb.js"></script>
 
+    <!-- Firebase SDK -->
+    <script type="application/javascript" src="fastclick.js"></script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+        query,
+        orderByChild,
+        limitToLast,
+        get,
+      } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
 
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyDSbK-__StsHpXOvCFpsgp_mzAFWNXDp9c",
+        authDomain: "ocean-game-496b9.firebaseapp.com",
+        databaseURL:
+          "https://ocean-game-496b9-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ocean-game-496b9",
+        storageBucket: "ocean-game-496b9.firebasestorage.app",
+        messagingSenderId: "668808198187",
+        appId: "1:668808198187:web:f2ae088e39a164a2c2526e",
+        measurementId: "G-S68ZN0XQ42",
+      };
 
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getDatabase(app);
+
+      function submitScore() {
+        const playerName = document.getElementById("playerName").value.trim();
+        if (!playerName) {
+          alert("Your name!");
+          return;
+        }
+
+        push(ref(db, "scores/"), {
+          user_name: playerName,
+          score: score,
+          timestamp: Date.now(),
+        });
+
+        alert("Save success!");
+        loadLeaderboard();
+        document.getElementById("scoreModal").style.display = "none";
+        isShowSubmitForm = false;
+      }
+
+      function loadLeaderboard() {
+        const db = getDatabase();
+        const top5List = document.getElementById("leaderboardTop5");
+
+        const scoresRef = ref(db, "scores/");
+        get(scoresRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            let scores = Object.values(snapshot.val());
+
+            scores.sort((a, b) => b.score - a.score);
+
+            const top5 = scores.slice(0, 3);
+            top5List.innerHTML = "";
+
+            top5.forEach((entry, index) => {
+              let medal = "";
+              if (index === 0) medal = "🥇";
+              else if (index === 1) medal = "🥈";
+              else if (index === 2) medal = "🥉";
+
+              const li = document.createElement("li");
+              li.innerHTML = `<span>${medal}</span> ${entry.user_name} - <strong>${entry.score}</strong>`;
+              top5List.appendChild(li);
+            });
+          } else {
+            top5List.innerHTML = "<li>!!!!!!</li>";
+          }
+        });
+      }
+
+      function showLeaderboard() {
+        const db = getDatabase();
+        const leaderboardList = document.getElementById("leaderboardList");
+        leaderboardList.innerHTML = "🔄 Loading...";
+
+        const scoresRef = ref(db, "scores/");
+        get(scoresRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            let scores = Object.values(snapshot.val());
+
+            scores.sort((a, b) => b.score - a.score);
+
+            const top10 = scores.slice(0, 10);
+            leaderboardList.innerHTML = "";
+
+            top10.forEach((entry, index) => {
+              let medal = "";
+              if (index === 0) medal = "🥇";
+              else if (index === 1) medal = "🥈";
+              else if (index === 2) medal = "🥉";
+
+              const li = document.createElement("li");
+              li.innerHTML = `<span>${medal}</span> <p>${entry.user_name}</p>  <strong>${entry.score}</strong>`;
+              leaderboardList.appendChild(li);
+            });
+          } else {
+            leaderboardList.innerHTML = "!!!!!!";
+          }
+        });
+
+        document.getElementById("leaderboardModal").style.display = "block";
+      }
+
+      function closeLeaderboard() {
+        document.getElementById("leaderboardModal").style.display = "none";
+      }
+
+      window.submitScore = submitScore;
+      window.showLeaderboard = showLeaderboard;
+      window.closeLeaderboard = closeLeaderboard;
+      window.isShowSubmitForm = false;
+      loadLeaderboard();
+      showLeaderboard();
+    </script>
+    <script type="module" src="fb.js"></script>
   </head>
 
   <style>
@@ -68,12 +192,111 @@
     canvas {
       -webkit-tap-highlight-color: transparent;
     }
+    /* Modal styles */
+
+    #leaderboardPreview {
+      position: fixed;
+      top: 20px;
+      right: 0px;
+      padding: 10px 0 10px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 150px;
+      text-align: center;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      color: #fff;
+    }
+    #leaderboardPreview h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    #leaderboardPreview ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #leaderboardPreview li {
+      font-size: 14px;
+      padding: 5px;
+    }
+    li {
+      list-style: none;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    }
+    .modal-content {
+      text-align: center;
+    }
+    .close {
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    #leaderboardList {
+      margin: auto;
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    #leaderboardList li {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #leaderboardList span {
+      width: 120px;
+      text-align: left;
+    }
+    #leaderboardList p {
+      width: 140px;
+      padding: 8px 0;
+      margin: 0;
+      text-align: left;
+    }
+    #leaderboardList strong {
+      width: 120px;
+    }
   </style>
   <body style="padding: 0; margin: 0; outline: 0; overflow: hidden">
     <canvas id="canvas"></canvas>
-<div id="leaderboard"></div>
+    <div id="leaderboardPreview" onclick="showLeaderboard()">
+      <h3>🏆 Ranking</h3>
+      <ul id="leaderboardTop5"></ul>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeLeaderboard()">&times;</span>
+        <h2>🏆 Ranking</h2>
+        <ul id="leaderboardList"></ul>
+      </div>
+    </div>
+
+    <!-- Icon mở bảng xếp hạng -->
+    <button id="leaderboardBtn" onclick="showLeaderboard()">📊 Ranking</button>
     <br />
-    
-   
+    <div id="scoreModal" class="modal">
+      <div class="modal-content">
+        <h2>Enter your name</h2>
+        <input type="text" id="playerName" placeholder="Your name" />
+        <button onclick="submitScore()">Save score</button>
+      </div>
+    </div>
   </body>
 </html>

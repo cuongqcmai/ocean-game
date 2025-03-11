@@ -1,3 +1,9 @@
+import {
+  getDatabase,
+  ref,
+  push,
+} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
+
 var canvas, ctx;
 var width, height, birdPos;
 var sky, land, bird, pipe, pipeUp, pipeDown, scoreBoard, ready, splash;
@@ -7,19 +13,14 @@ var pipes = [],
   pipesDir = [],
   pipeSt,
   pipeNumber;
-var score, maxScore;
+var maxScore;
 var dropSpeed;
 var flashlight_switch = false,
   hidden_switch = false;
 var mode, delta;
-var wechat = false;
 var playend = false,
   playdata = [];
-var wxData;
-
-
-
-
+window.score = 0;
 
 sky = new Image();
 sky.src = "images/sky.png";
@@ -120,11 +121,21 @@ var initCanvas = function () {
       },
       false
     );
-  } else canvas.onmousedown = jump;
+  } else {
+    canvas.onmousedown = jump;
+  }
   window.onkeydown = jump;
+
   FastClick.attach(canvas);
   loadImages();
 };
+
+function showScoreModal() {
+  isShowSubmitForm = true;
+  document.getElementById("scoreModal").style.display = "block";
+}
+
+// Gửi điểm lên Firebase
 
 var deathAnimation = function () {
   if (splash) {
@@ -143,7 +154,7 @@ var deathAnimation = function () {
 
 var drawSky = function () {
   var isMobile = width < 768; // Xác định thiết bị dựa vào chiều rộng màn hình
-  var scale = isMobile ? 0.7 : 0.9; // Mobile: 80%, PC: 90%
+  var scale = isMobile ? 0.5 : 0.8; // Mobile: 80%, PC: 90%
 
   var imgRatio = sky.width / sky.height;
   var canvasRatio = width / height;
@@ -157,7 +168,7 @@ var drawSky = function () {
     // Ảnh cao hơn màn hình → Cắt bớt chiều dọc
     var newHeight = (width / imgRatio) * scale;
     var offsetY = (height - newHeight) / 2;
-    ctx.drawImage(sky, 0, offsetY, width * scale, newHeight);
+    ctx.drawImage(sky, isMobile ? 0 : 200, offsetY, width * scale, newHeight);
   }
 };
 
@@ -186,6 +197,7 @@ var drawPipe = function (x, y) {
   ) {
     clearInterval(animation);
     death = 1;
+    showScoreModal();
   } else if (x + 40 < 0) {
     pipeSt++;
     pipeNumber++;
@@ -218,18 +230,33 @@ var drawBird = function () {
   if (birdY + 138 > height) {
     clearInterval(animation);
     death = 1;
+    showScoreModal();
   }
-  if (death) deathAnimation();
+  if (death) {
+    deathAnimation();
+  }
 };
 
 var drawScore = function () {
-  ctx.font = '20px "Press Start 2P"';
+  ctx.font = '50px "Press Start 2P"';
   ctx.lineWidth = 5;
   ctx.strokeStyle = "#fff";
   ctx.fillStyle = "#000";
   var txt = "" + score;
-  ctx.strokeText(txt, (width - ctx.measureText(txt).width) / 2, height * 0.15);
-  ctx.fillText(txt, (width - ctx.measureText(txt).width) / 2, height * 0.15);
+  ctx.strokeText(
+    txt,
+    50,
+    80,
+    (width - ctx.measureText(txt).width) / 2,
+    height * 0.15
+  );
+  ctx.fillText(
+    txt,
+    50,
+    80,
+    (width - ctx.measureText(txt).width) / 2,
+    height * 0.15
+  );
 };
 
 var drawShadow = function () {
@@ -302,6 +329,9 @@ var anim = function () {
 };
 
 var jump = function () {
+  if (isShowSubmitForm == true) {
+    return;
+  }
   if (death) {
     dist = 0;
     birdY = (height - 112) / 2;
@@ -360,66 +390,4 @@ window.onload = function () {
     canvas.height = height = window.innerHeight;
     drawCanvas();
   };
- 
 };
-
-// // Firebase Config
-// const firebaseConfig = {
-//   apiKey: "AIzaSyB8sL8eikrdab-VyCoLA0jeWacXZqkaVdc",
-//   authDomain: "ocean-game-1b6d2.firebaseapp.com",
-//   databaseURL: "https://ocean-game-1b6d2-default-rtdb.firebaseio.com",
-//   projectId: "ocean-game-1b6d2",
-//   storageBucket: "ocean-game-1b6d2.appspot.com",
-//   messagingSenderId: "219096053823",
-//   appId: "1:219096053823:web:cb6fee080a35107891208a",
-//   measurementId: "G-PG8Q5S29DZ"
-// };
-
-// // Khởi tạo Firebase (Không dùng import, dùng trực tiếp từ CDN)
-// if (typeof firebase !== "undefined") {
-//   firebase.initializeApp(firebaseConfig);
-//   const db = firebase.database();
-// } else {
-//   console.error("Firebase chưa được tải!");
-// }
-
-// // Lưu điểm lên Firebase
-// function saveScore(playerName, score) {
-//   if (!firebase.database) {
-//     console.error("Firebase Database chưa khởi tạo!");
-//     return;
-//   }
-//   db.ref("scores/").push({
-//     name: playerName,
-//     score: score,
-//     timestamp: Date.now()
-//   });
-// }
-
-// // Hiển thị bảng xếp hạng
-// function loadLeaderboard() {
-//   if (!document.getElementById("leaderboard")) {
-//     console.error("Không tìm thấy phần tử leaderboard!");
-//     return;
-//   }
-
-//   db.ref("scores/")
-//     .orderByChild("score")
-//     .limitToLast(10)
-//     .once("value", (snapshot) => {
-//       let scores = [];
-//       snapshot.forEach((child) => {
-//         scores.push(child.val());
-//       });
-//       scores.reverse();
-//       let leaderboardHTML = scores
-//         .map((s, i) => `<p>${i + 1}. ${s.name} - ${s.score}</p>`)
-//         .join("");
-//       document.getElementById("leaderboard").innerHTML = leaderboardHTML;
-//     });
-// }
-
-// // Khi trang load, gọi bảng xếp hạng
-// window.onload = function () {
-//   loadLeaderboard();
-// }
