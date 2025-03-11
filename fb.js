@@ -107,6 +107,8 @@ var initCanvas = function () {
   canvas.width = width = window.innerWidth;
   canvas.height = height = window.innerHeight;
   if (is_touch_device()) {
+    // bgMusic.play();
+
     canvas.addEventListener(
       "touchend",
       function (e) {
@@ -117,7 +119,6 @@ var initCanvas = function () {
     canvas.addEventListener(
       "touchstart",
       function (e) {
-        bgMusic.play();
         jump();
         e.preventDefault();
       },
@@ -372,6 +373,8 @@ var jump = function () {
       }
     }, 3000);
   }
+  bgMusic.play();
+
   jumpSound.currentTime = 0;
   jumpSound.play();
   birdV = 6;
