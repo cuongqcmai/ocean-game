@@ -225,7 +225,6 @@ var drawPipe = function (x, y) {
   ctx.drawImage(pipeDown, x, y);
   ctx.drawImage(pipe, x, y + 168 + delta, pipe.width, height - 112);
   ctx.drawImage(pipeUp, x, y + 144 + delta);
-
   if (
     x < birdPos + 32 &&
     x + 50 > birdPos &&
@@ -233,12 +232,11 @@ var drawPipe = function (x, y) {
   ) {
     clearInterval(animation);
     death = 1;
-    hitSound.play();
     showScoreModal();
   } else if (x + 40 < 0) {
     pipeSt++;
     pipeNumber++;
-    pipes.push(Math.floor(Math.random() * (height - 300 - delta) + 10)); // 🔥 Áp dụng delta mới
+    pipes.push(Math.floor(Math.random() * (height - 300 - delta) + 10));
     pipesDir.push(Math.random() > 0.5);
   }
 };
@@ -351,7 +349,7 @@ var jump = function () {
     pipes = [];
     pipesDir = [];
     dropSpeed = 0.3;
-    delta = 100;
+    delta = 60;
     lastScoreMilestone = 0;
 
     for (var i = 0; i < 10; ++i) {
@@ -364,14 +362,11 @@ var jump = function () {
     difficultyIncrease = setInterval(() => {
       if (score > lastScoreMilestone) {
         lastScoreMilestone = score;
-        if (dropSpeed < 0.4) {
+        if (dropSpeed < 0.5) {
           dropSpeed *= 1.05;
         }
-        if (delta > 45) {
-          delta *= 0.95;
-        }
       }
-    }, 3000);
+    }, 5000);
   }
   bgMusic.play();
 

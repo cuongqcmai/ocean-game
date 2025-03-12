@@ -67,7 +67,7 @@
         isShowSubmitForm = false;
       }
 
-      function loadLeaderboard() {
+      function loadLeaderboard(limit = 3) {
         const db = getDatabase();
         const top5List = document.getElementById("leaderboardTop5");
 
@@ -78,7 +78,7 @@
 
             scores.sort((a, b) => b.score - a.score);
 
-            const top5 = scores.slice(0, 3);
+            const top5 = scores.slice(0, limit);
             top5List.innerHTML = "";
 
             top5.forEach((entry, index) => {
@@ -86,6 +86,7 @@
               if (index === 0) medal = "🥇";
               else if (index === 1) medal = "🥈";
               else if (index === 2) medal = "🥉";
+              else if (index > 2) medal = "️";
 
               const li = document.createElement("li");
               li.innerHTML = `<span>${medal}</span> ${entry.user_name} - <strong>${entry.score}</strong>`;
@@ -138,11 +139,28 @@
         document.getElementById("scoreModal").style.display = "none";
       }
 
+      let isExpanded = false;
+
+      function toggleLeaderboard() {
+        if (isExpanded) {
+          const icon = document.getElementById("arrow");
+          icon.src = "./images/arrow-down.png";
+          loadLeaderboard(3);
+        } else {
+          const icon = document.getElementById("arrow");
+          icon.src = "./images/arrow-up.png";
+          loadLeaderboard(10);
+        }
+        isExpanded = !isExpanded;
+      }
+      window.toggleLeaderboard = toggleLeaderboard;
+
       window.submitScore = submitScore;
       window.showLeaderboard = showLeaderboard;
       window.closeLeaderboard = closeLeaderboard;
       window.isShowSubmitForm = false;
       window.closeSubmitForm = closeSubmitForm;
+      window.loadLeaderboard = loadLeaderboard;
       loadLeaderboard();
     </script>
     <script type="module" src="fb.js"></script>
@@ -386,6 +404,34 @@
     .close-btn:hover {
       color: #555;
     }
+    #toggleLeaderboardBtn {
+      background: none;
+      color: #2e7d32;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      margin-top: 10px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #toggleLeaderboardBtn:hover {
+      color: #1b5e20;
+      transform: scale(1.1);
+    }
+
+    #toggleLeaderboardBtn i {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    #toggleLeaderboardBtn.active i {
+      transform: rotate(180deg);
+    }
 
     @keyframes fadeIn {
       from {
@@ -427,9 +473,19 @@
   </style>
   <body style="padding: 0; margin: 0; outline: 0; overflow: hidden">
     <canvas id="canvas"></canvas>
-    <div id="leaderboardPreview" onclick="showLeaderboard()">
-      <h3>🏆 Ranking</h3>
-      <ul id="leaderboardTop5"></ul>
+    <div id="leaderboardPreview">
+      <div onclick="showLeaderboard()">
+        <h3>🏆 Ranking</h3>
+        <ul id="leaderboardTop5"></ul>
+      </div>
+      <!-- showmore -->
+      <button
+        id="toggleLeaderboardBtn"
+        style="margin-top: 0"
+        onclick="toggleLeaderboard()"
+      >
+        <img id="arrow" width="25" height="15" src="./images/arrow-down.png" />
+      </button>
     </div>
 
     <div id="leaderboardModal">
