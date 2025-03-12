@@ -128,7 +128,18 @@ var initCanvas = function () {
     canvas.onmousedown = jump;
   }
   window.onkeydown = jump;
-
+  clearInterval(difficultyIncrease);
+  difficultyIncrease = setInterval(() => {
+    if (score > lastScoreMilestone) {
+      lastScoreMilestone = score;
+      if (dropSpeed < 0.5) {
+        dropSpeed *= 1.05;
+      }
+      if (delta > 50) {
+        delta *= 0.95;
+      }
+    }
+  }, 5000);
   FastClick.attach(canvas);
   loadImages();
 };
@@ -162,19 +173,17 @@ var deathAnimation = function () {
 };
 
 var drawSky = function () {
-  var isMobile = width < 768; // Xác định thiết bị dựa vào chiều rộng màn hình
-  var scale = isMobile ? 0.5 : 0.8; // Mobile: 80%, PC: 90%
+  var isMobile = width < 768;
+  var scale = isMobile ? 0.5 : 0.8;
 
   var imgRatio = sky.width / sky.height;
   var canvasRatio = width / height;
 
   if (imgRatio > canvasRatio) {
-    // Ảnh rộng hơn màn hình → Cắt bớt chiều ngang
     var newWidth = height * imgRatio * scale;
     var offsetX = (width - newWidth) / 2;
     ctx.drawImage(sky, offsetX, isMobile ? 100 : 0, newWidth, height * scale);
   } else {
-    // Ảnh cao hơn màn hình → Cắt bớt chiều dọc
     var newHeight = (width / imgRatio) * scale;
     var offsetY = (height - newHeight) / 2;
     ctx.drawImage(sky, isMobile ? 0 : 200, offsetY, width * scale, newHeight);
@@ -349,7 +358,7 @@ var jump = function () {
     pipes = [];
     pipesDir = [];
     dropSpeed = 0.3;
-    delta = 60;
+    delta = 100;
     lastScoreMilestone = 0;
 
     for (var i = 0; i < 10; ++i) {
@@ -358,15 +367,6 @@ var jump = function () {
     }
 
     anim();
-    clearInterval(difficultyIncrease);
-    difficultyIncrease = setInterval(() => {
-      if (score > lastScoreMilestone) {
-        lastScoreMilestone = score;
-        if (dropSpeed < 0.5) {
-          dropSpeed *= 1.05;
-        }
-      }
-    }, 5000);
   }
   bgMusic.play();
 
