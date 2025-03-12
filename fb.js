@@ -128,18 +128,18 @@ var initCanvas = function () {
     canvas.onmousedown = jump;
   }
   window.onkeydown = jump;
-  clearInterval(difficultyIncrease);
-  difficultyIncrease = setInterval(() => {
-    if (score > lastScoreMilestone) {
-      lastScoreMilestone = score;
-      if (dropSpeed < 0.5) {
-        dropSpeed *= 1.05;
-      }
-      if (delta > 50) {
-        delta *= 0.95;
-      }
-    }
-  }, 5000);
+  // clearInterval(difficultyIncrease);
+  // difficultyIncrease = setInterval(() => {
+  //   if (score > lastScoreMilestone) {
+  //     lastScoreMilestone = score;
+  //     if (dropSpeed < 0.5) {
+  //       dropSpeed *= 1.05;
+  //     }
+  //     if (delta > 50) {
+  //       delta *= 0.95;
+  //     }
+  //   }
+  // }, 5000);
   FastClick.attach(canvas);
   loadImages();
 };
@@ -357,8 +357,8 @@ var jump = function () {
     pipeNumber = 10;
     pipes = [];
     pipesDir = [];
-    dropSpeed = 0.3;
-    delta = 100;
+    dropSpeed = 0.4;
+    delta = 50;
     lastScoreMilestone = 0;
 
     for (var i = 0; i < 10; ++i) {
@@ -381,7 +381,7 @@ window.onload = function () {
   playdata = [0, 0];
   maxScore = 0;
   dropSpeed = 0.3;
-  delta = 100;
+  delta = 10;
 
   initCanvas();
 
